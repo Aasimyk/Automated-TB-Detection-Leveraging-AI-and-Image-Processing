@@ -1,0 +1,128 @@
+import numpy as np
+import tensorflow as tf
+import matplotlib.pyplot as plt
+from tensorflow.keras.preprocessing.image import ImageDataGenerator
+from tensorflow.keras.utils import img_to_array, load_img
+from sklearn.metrics import classification_report, confusion_matrix, precision_recall_curve
+import os
+
+# Paths to folders already defined
+TB_FOLDER = '/content/drive/MyDrive/Data1/TB Chest X-rays'
+NORMAL_FOLDER = '/content/drive/MyDrive/Data1/Normal Chest X-rays'
+
+# Load image paths
+tb_images = os.listdir(TB_FOLDER)
+normal_images = os.listdir(NORMAL_FOLDER)
+
+# Take equal samples from both classes
+num_normal_images = len(normal_images)
+balanced_tb_images = tb_images[:num_normal_images]
+balanced_normal_images = normal_images  # Use the correct variable name
+
+print("Number of TB images:", len(balanced_tb_images))
+print("Number of Normal images:", len(balanced_normal_images))
+
+# Step 1: Split the image paths into training and validation sets
+from sklearn.model_selection import train_test_split
+tb_train, tb_val = train_test_split(balanced_tb_images, test_size=0.2, random_state=42)
+normal_train, normal_val = train_test_split(balanced_normal_images, test_size=0.2, random_state=42)
+
+# Create full file paths
+train_files = [(os.path.join(TB_FOLDER, f), 1) for f in tb_train] + [(os.path.join(NORMAL_FOLDER, f), 0) for f in normal_train]
+val_files = [(os.path.join(TB_FOLDER, f), 1) for f in tb_val] + [(os.path.join(NORMAL_FOLDER, f), 0) for f in normal_val]
+
+# Helper function to load images
+def load_images(file_paths):
+    images, labels = [], []
+    for file_path, label in file_paths:
+        img = load_img(file_path, target_size=(150, 150))
+        img_array = img_to_array(img) / 255.0  # Normalize pixel values
+        images.append(img_array)
+        labels.append(label)
+    return np.array(images), np.array(labels)
+
+# Load training and validation images
+X_train, y_train = load_images(train_files)
+X_val, y_val = load_images(val_files)
+
+# Step 2: Augment the training images
+train_datagen = ImageDataGenerator(rotation_range=15, horizontal_flip=True)
+train_generator = train_datagen.flow(X_train, y_train, batch_size=32)
+
+# Step 3: Model Building
+model = tf.keras.models.Sequential([
+    tf.keras.layers.Conv2D(32, (3, 3), activation='relu', input_shape=(150, 150, 3)),
+    tf.keras.layers.MaxPooling2D(2, 2),
+    tf.keras.layers.Conv2D(64, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2, 2),
+    tf.keras.layers.Conv2D(128, (3, 3), activation='relu'),
+    tf.keras.layers.MaxPooling2D(2, 2),
+    tf.keras.layers.Flatten(),
+    tf.keras.layers.Dense(512, activation='relu'),
+    tf.keras.layers.Dropout(0.5),
+    tf.keras.layers.Dense(1, activation='sigmoid')
+])
+
+model.compile(optimizer='adam', loss='binary_crossentropy', metrics=['accuracy'])
+
+# Step 4: Train the Model
+history = model.fit(train_generator, epochs=12, validation_data=(X_val, y_val))
+
+# Step 5: Visualize Training Results
+def plot_training(history):
+    acc = history.history['accuracy']
+    val_acc = history.history['val_accuracy']
+    loss = history.history['loss']
+    val_loss = history.history['val_loss']
+    epochs = range(1, len(acc) + 1)
+
+    plt.figure(figsize=(12, 5))
+    plt.subplot(1, 2, 1)
+    plt.plot(epochs, acc, 'b', label='Training accuracy')
+    plt.plot(epochs, val_acc, 'r', label='Validation accuracy')
+    plt.title('Training and Validation Accuracy')
+    plt.legend()
+
+    plt.subplot(1, 2, 2)
+    plt.plot(epochs, loss, 'b', label='Training Loss')
+    plt.plot(epochs, val_loss, 'r', label='Validation Loss')
+    plt.title('Training and Validation Loss')
+    plt.legend()
+    plt.show()
+
+plot_training(history)
+
+# Step 6: Print Accuracy and Model Evaluation
+final_train_accuracy = history.history['accuracy'][-1]
+final_val_accuracy = history.history['val_accuracy'][-1]
+print(f"Final Training Accuracy: {final_train_accuracy:.4f}")
+print(f"Final Validation Accuracy: {final_val_accuracy:.4f}")
+
+predictions = (model.predict(X_val) > 0.5).astype("int32")
+
+print("Classification Report:")
+print(classification_report(y_val, predictions, target_names=['NORMAL', 'TB']))
+
+# Confusion matrix
+conf_matrix = confusion_matrix(y_val, predictions)
+plt.figure(figsize=(8, 6))
+plt.imshow(conf_matrix, cmap='Blues', interpolation='nearest')
+plt.colorbar()
+plt.xticks(np.arange(2), ['NORMAL', 'TB'])
+plt.yticks(np.arange(2), ['NORMAL', 'TB'])
+plt.xlabel("Predicted Label")
+plt.ylabel("True Label")
+plt.title("Confusion Matrix")
+plt.show()
+
+# Precision-Recall Curve
+y_prob = model.predict(X_val).ravel()
+precision, recall, _ = precision_recall_curve(y_val, y_prob)
+
+plt.figure(figsize=(8, 6))
+plt.plot(recall, precision, marker='.', label='Precision-Recall Curve')
+plt.xlabel('Recall')
+plt.ylabel('Precision')
+plt.title('Precision-Recall Curve')
+plt.legend()
+plt.show()
