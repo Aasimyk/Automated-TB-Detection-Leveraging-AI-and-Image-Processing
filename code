@@ -1,3 +1,6 @@
+#property of Asim Yash Khakha
+#If the code is used, it is subjected to Copywrite 
+
 import numpy as np
 import tensorflow as tf
 import matplotlib.pyplot as plt
