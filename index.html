@@ -1,0 +1,87 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Automated TB Detection - INC4 2025</title>
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <header class="hero">
+    <h1>Automatic Detection of Pulmonary Tuberculosis</h1>
+    <p>📍 Presented at INC4 Kengeri Chapter 2025 | Publishing in Progress</p>
+  </header>
+
+  <section class="content">
+    <h2>About the Research</h2>
+    <p>This project proposes an automated approach to detect pulmonary tuberculosis (TB) using chest X-rays (CXR). Under the mentorship of <strong>Dr. Ramesh Poonia</strong>, this work applies image processing techniques to improve diagnostic accuracy.</p>
+  </section>
+
+  <section class="content alt">
+    <h2>Methodology</h2>
+    <ul>
+      <li><strong>Preprocessing:</strong> Wiener filtering and histogram equalization</li>
+      <li><strong>Image Registration:</strong> Rigid alignment using histogram-based similarity</li>
+      <li><strong>Segmentation:</strong> Watershed segmentation of lung regions</li>
+    </ul>
+  </section>
+
+  <section class="content">
+    <h2>Datasets Used</h2>
+    <ul>
+      <li><strong>JSRT:</strong> 247 chest X-rays (138 nodule, 93 non-nodule)</li>
+      <li><strong>Montgomery County:</strong> 138 X-rays (80 normal, 58 TB cases)</li>
+    </ul>
+  </section>
+
+  <section class="content alt">
+    <h2>Summary of Results</h2>
+    <p>The proposed watershed segmentation method demonstrated improved sensitivity and specificity over traditional techniques like global thresholding and active contour.</p>
+
+    <h3>Table 1: Sensitivity & Specificity Comparison</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Case</th>
+          <th>Watershed Sensitivity</th>
+          <th>Watershed Specificity</th>
+          <th>Global Thresholding Sensitivity</th>
+          <th>Global Thresholding Specificity</th>
+          <th>Active Contour Sensitivity</th>
+          <th>Active Contour Specificity</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Normal Case1</td><td>0.6756</td><td>0.3583</td><td>0.7005</td><td>0.3424</td><td>0.1305</td><td>0.6613</td></tr>
+        <tr><td>Abnormal Case2</td><td>0.5247</td><td>0.3722</td><td>0.4633</td><td>0.3728</td><td>0.3345</td><td>0.6793</td></tr>
+        <tr><td><strong>Average</strong></td><td><strong>0.5574</strong></td><td><strong>0.3581</strong></td><td><strong>0.5447</strong></td><td><strong>0.3511</strong></td><td><strong>0.1931</strong></td><td><strong>0.6870</strong></td></tr>
+      </tbody>
+    </table>
+
+    <h3>Table 2: Accuracy Comparison</h3>
+    <table>
+      <thead>
+        <tr>
+          <th>Segmentation Method</th>
+          <th>Accuracy</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>Watershed</td><td>59.8%</td></tr>
+        <tr><td>Global Thresholding</td><td>59.4%</td></tr>
+        <tr><td>Active Contour</td><td>34.4%</td></tr>
+      </tbody>
+    </table>
+  </section>
+
+  <section class="content">
+    <h2>Acknowledgments</h2>
+    <p>Thanks to <strong>Dr. Ramesh Poonia</strong> for his mentorship and INC4 2025 for the opportunity to present this work. The paper is currently in the publishing phase.</p>
+  </section>
+
+  <footer>
+    <p>&copy; 2025 | TB Detection Research Site</p>
+  </footer>
+</body>
+</html>
